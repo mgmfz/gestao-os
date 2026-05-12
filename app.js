@@ -382,13 +382,25 @@ async function doAuth(tab) {
 }
 
 async function afterLogin() {
-  await recarregarTudo();
   hideAuthScreen();
+  applyTheme(CFG.theme||'light');
+  if(CFG.accentColor){
+    document.documentElement.style.setProperty('--accent',CFG.accentColor);
+    document.documentElement.style.setProperty('--accent-dark',CFG.accentColor);
+  }
+  buildDemoData();
   applyConfig();
   renderSidebar();
   renderEstSelect();
   document.getElementById('bottomNav').style.display='flex';
-  if(CFG.firstRun!==false){showWizard();}else{nav('dashboard');}
+  // Load data in background - don't block
+  if(CFG.firstRun!==false){
+    showWizard();
+    recarregarTudo().then(()=>{renderEstSelect();});
+  } else {
+    nav('dashboard');
+    recarregarTudo().then(()=>{renderEstSelect();nav(PAGE);});
+  }
 }
 
 function usarDemo() {
@@ -2121,10 +2133,28 @@ function wzFinish(){
   LOCAL.estabelecimentos[0].tipo = WZ.tipo;
 
   applyTheme(CFG.theme);
+  // Apply accent color properly
+  document.documentElement.style.setProperty('--accent', WZ.cor);
+  document.documentElement.style.setProperty('--accent-dark', WZ.cor);
+  const isDark2 = document.body.getAttribute('data-theme')==='dark';
+  document.documentElement.style.setProperty('--accent-light', isDark2 ? WZ.cor+'30' : WZ.cor+'18');
+  document.documentElement.style.setProperty('--accent-text', isDark2 ? WZ.cor+'dd' : WZ.cor);
+
+  // Create first establishment in Supabase if logged in
+  if(supa && AUTH_USER) {
+    dbInsert('estabelecimentos', { owner_id: AUTH_USER.id, nome: WZ.nome, tipo: WZ.tipo }).then(saved => {
+      if(saved) { LOCAL.estabelecimentos = [saved]; EST = saved.id; renderEstSelect(); }
+    });
+  } else {
+    LOCAL.estabelecimentos[0].nome = WZ.nome;
+    LOCAL.estabelecimentos[0].tipo = WZ.tipo;
+  }
+
   applyConfig();
   renderSidebar();
   renderEstSelect();
   hideWizard();
+  document.getElementById('bottomNav').style.display='flex';
   toast('Bem-vindo ao GestãoOS! 🎉','success',4000);
   nav('dashboard');
 }
@@ -2145,33 +2175,37 @@ async function start(){
   }
 
   buildDemoData();
+  applyConfig();
+  renderSidebar();
+  renderEstSelect();
 
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
     if(CFG.theme==='system') applyTheme('system');
   });
 
-  // If Supabase configured, try to restore session
+  // Always init Supabase first (credentials are hardcoded)
   if(CFG.url && CFG.key) {
-    const ok = await initSupa();
-    if(ok) {
-      const session = await getSession();
-      if(session) {
-        // User already logged in
-        await recarregarTudo();
-        applyConfig();
-        renderSidebar();
-        renderEstSelect();
-        if(CFG.firstRun !== false) { showWizard(); return; }
-        nav('dashboard');
-        return;
+    try {
+      const ok = await initSupa();
+      if(ok) {
+        const session = await getSession();
+        if(session) {
+          // User already logged in — restore session
+          document.getElementById('bottomNav').style.display='flex';
+          if(CFG.firstRun !== false) {
+            showWizard();
+            recarregarTudo().then(()=>renderEstSelect());
+          } else {
+            recarregarTudo().then(()=>{renderEstSelect();nav('dashboard');});
+            nav('dashboard');
+          }
+          return;
+        }
       }
-    }
+    } catch(e) { console.warn('Supabase init failed:', e); }
   }
 
   // No session — show auth screen
-  applyConfig();
-  renderSidebar();
-  renderEstSelect();
   showAuthScreen('login');
 }
 
