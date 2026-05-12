@@ -393,13 +393,15 @@ async function afterLogin() {
   renderSidebar();
   renderEstSelect();
   document.getElementById('bottomNav').style.display='flex';
-  // Load data in background - don't block
+  document.getElementById('app').style.display='flex';
+
   if(CFG.firstRun!==false){
     showWizard();
-    recarregarTudo().then(()=>{renderEstSelect();});
+    // load data silently in background
+    if(supa) recarregarTudo().then(()=>renderEstSelect()).catch(()=>{});
   } else {
     nav('dashboard');
-    recarregarTudo().then(()=>{renderEstSelect();nav(PAGE);});
+    if(supa) recarregarTudo().then(()=>{ renderEstSelect(); nav(PAGE); }).catch(()=>{});
   }
 }
 
@@ -1777,13 +1779,13 @@ async function salvarEst(editId){
 }
 
 function getSQL(){return`create table if not exists estabelecimentos(id uuid default gen_random_uuid() primary key,nome text,tipo text,created_at timestamptz default now());
-create table if not exists transacoes(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,tipo text,valor numeric(12,2),desc text,cat text,data date,obs text,created_at timestamptz default now());
+create table if not exists transacoes(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,tipo text,valor numeric(12,2),descricao text,cat text,data date,obs text,created_at timestamptz default now());
 create table if not exists estoque(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,cat text,qtd numeric,min numeric,custo numeric,unidade text,updated_at timestamptz default now());
 create table if not exists funcionarios(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,cargo text,salario numeric,status text,tel text,admissao date);
 create table if not exists clientes(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,tel text,email text,visitas int,total_gasto numeric,ultima date,aniver date);
 create table if not exists fornecedores(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,cat text,contato text,tel text,email text,prazo_pagamento int,status text);
-create table if not exists cardapio(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,cat text,desc text,preco numeric,custo numeric,ativo boolean default true);
-create table if not exists fiscal(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,desc text,tipo text,valor numeric,venc date,status text,pago_em date);
+create table if not exists cardapio(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,cat text,descricao text,preco numeric,custo numeric,ativo boolean default true);
+create table if not exists fiscal(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,descricao text,tipo text,valor numeric,venc date,status text,pago_em date);
 create table if not exists metas(id uuid default gen_random_uuid() primary key,est_id uuid references estabelecimentos(id) on delete cascade,nome text,atual numeric,meta numeric,unidade text,prazo date,cat text);
 do $$declare tb text;begin for tb in select unnest(array['estabelecimentos','transacoes','estoque','funcionarios','clientes','fornecedores','cardapio','fiscal','metas'])loop execute 'alter table '||tb||' enable row level security;create policy if not exists "open" on '||tb||' for all using(true)';end loop;end$$;`;}
 
@@ -1800,11 +1802,25 @@ async function conectarSupa(){
 }
 
 async function recarregarTudo(){
-  if(!supa)return;
-  const load=async(tb,key,order='created_at')=>{const d=await dbSelect(tb,{},{order,asc:false});if(d)LOCAL[key]=d;};
-  await Promise.all([load('estabelecimentos','estabelecimentos'),load('transacoes','transacoes'),load('estoque','estoque','updated_at'),load('funcionarios','funcionarios'),load('clientes','clientes'),load('fornecedores','fornecedores'),load('cardapio','cardapio'),load('fiscal','fiscal','venc'),load('metas','metas','prazo')]);
-  if(LOCAL.estabelecimentos.length)EST=LOCAL.estabelecimentos[0].id;
-  renderEstSelect();toast(t('salvo'));nav(PAGE);
+  if(!supa) return;
+  try {
+    const load=async(tb,key,order='created_at')=>{
+      const d=await dbSelect(tb,{},{order,asc:false});
+      if(d && d.length >= 0) LOCAL[key]=d;
+    };
+    await Promise.all([
+      load('estabelecimentos','estabelecimentos'),
+      load('transacoes','transacoes'),
+      load('estoque','estoque','updated_at'),
+      load('funcionarios','funcionarios'),
+      load('clientes','clientes'),
+      load('fornecedores','fornecedores'),
+      load('cardapio','cardapio'),
+      load('fiscal','fiscal','venc'),
+      load('metas','metas','prazo'),
+    ]);
+    if(LOCAL.estabelecimentos.length) EST=LOCAL.estabelecimentos[0].id;
+  } catch(e) { console.error('recarregarTudo error:', e); }
 }
 
 function desconectar(){
@@ -1863,7 +1879,7 @@ function showWizard(){
   document.getElementById('bottomNav').style.display='none';
   const wz=document.getElementById('wizard-root');
   wz.style.display='flex';
-  WZ={step:1,tipo:'',nome:'',responsavel:'',moeda:'BRL',lang:'pt-BR',theme:'dark',modulos:['financeiro','estoque','relatorios','metas','fiscal'],cor:'#2563EB'};
+  WZ={step:1,tipo:'',nome:CFG.responsavel||'',responsavel:CFG.responsavel||'',moeda:CFG.moeda||'BRL',lang:CFG.lang||'pt-BR',theme:'light',modulos:['financeiro','estoque','relatorios','metas','fiscal'],cor:CFG.accentColor||'#2563EB'};
   renderWizard();
 }
 
