@@ -238,10 +238,14 @@ async function initSupa() {
   try {
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
     supa = createClient(CFG.url, CFG.key);
-    const { error } = await supa.from('estabelecimentos').select('id').limit(1);
+    // Just verify the connection works — don't fail if table is empty
+    const { error } = await supa.auth.getSession();
     if (error) throw error;
     CFG.ok = true; saveCFG(); setConnUI(true); return true;
-  } catch(e) { supa = null; CFG.ok = false; setConnUI(false); return false; }
+  } catch(e) {
+    console.error('initSupa failed:', e);
+    supa = null; CFG.ok = false; setConnUI(false); return false;
+  }
 }
 
 function setConnUI(ok) {
@@ -363,6 +367,27 @@ async function doAuth(tab) {
   err.style.display='none';
   if(!email||!pass){err.textContent='Preencha e-mail e senha';err.style.display='block';return;}
   btn.disabled=true;btn.innerHTML='<i class="ti ti-loader spin"></i> Aguarde...';
+
+  // Init Supabase if not yet connected
+  if(!supa && CFG.url && CFG.key) {
+    const ok = await initSupa();
+    if(!ok){
+      err.textContent='Erro ao conectar com o banco de dados. Tente novamente.';
+      err.style.display='block';
+      btn.disabled=false;
+      btn.innerHTML=tab==='register'?'<i class="ti ti-user-plus"></i> Criar conta':'<i class="ti ti-login"></i> Entrar';
+      return;
+    }
+  }
+
+  if(!supa){
+    err.textContent='Sem conexão com Supabase. Configure em Configurações → Banco de dados.';
+    err.style.display='block';
+    btn.disabled=false;
+    btn.innerHTML=tab==='register'?'<i class="ti ti-user-plus"></i> Criar conta':'<i class="ti ti-login"></i> Entrar';
+    return;
+  }
+
   if(tab==='register'){
     const nome=document.getElementById('authNome')?.value.trim();
     const pass2=document.getElementById('authPass2')?.value;
