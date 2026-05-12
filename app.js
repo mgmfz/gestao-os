@@ -394,6 +394,7 @@ async function afterLogin() {
   renderEstSelect();
   document.getElementById('bottomNav').style.display='flex';
   document.getElementById('app').style.display='flex';
+  renderAmanda(); // Amanda AI assistant
 
   if(CFG.firstRun!==false){
     showWizard();
@@ -410,6 +411,7 @@ function usarDemo() {
   buildDemoData();
   hideAuthScreen();
   document.getElementById('bottomNav').style.display='flex';
+  renderAmanda();
   if(CFG.firstRun!==false){showWizard();}else{nav('dashboard');}
 }
 
@@ -555,7 +557,7 @@ function confirm2(msg,cb){
     </div>`);
 }
 
-function txEst(){return(LOCAL.transacoes||[]).filter(x=>x.est_id===EST);}
+function txEst(){return(LOCAL.transacoes||[]).filter(x=>!EST||x.est_id===EST);}
 function totalR(){return txEst().filter(x=>x.tipo==='receita').reduce((s,x)=>s+Number(x.valor),0);}
 function totalD(){return txEst().filter(x=>x.tipo==='despesa').reduce((s,x)=>s+Number(x.valor),0);}
 
@@ -659,7 +661,14 @@ function nav(id){
     fornecedores:pgFornecedores,cardapio:pgCardapio,fiscal:pgFiscal,
     metas:pgMetas,relatorios:pgRelatorios,config:pgConfig};
   const fn=pages[id];
-  document.getElementById('mainContent').innerHTML=fn?fn():`<div class="empty"><i class="ti ti-construction"></i></div>`;
+  let html='';
+  try {
+    html = fn ? fn() : `<div class="empty"><i class="ti ti-construction"></i><div class="empty-title">Página não encontrada</div></div>`;
+  } catch(e) {
+    console.error('Erro ao renderizar página '+id+':', e);
+    html = `<div class="empty"><i class="ti ti-alert-circle" style="color:var(--red)"></i><div class="empty-title">Erro ao carregar</div><div class="empty-sub" style="font-family:monospace;font-size:11px">${e.message}</div><button class="btn btn-secondary" style="margin-top:1rem" onclick="nav('${id}')"><i class="ti ti-refresh"></i> Tentar novamente</button></div>`;
+  }
+  document.getElementById('mainContent').innerHTML=html;
   if(id==='dashboard')renderDashCharts();
   if(id==='fluxo')renderFluxoChart();
   if(id==='relatorios')renderRelCharts();
@@ -697,7 +706,7 @@ function pgDashboard(){
         <table>
           <thead><tr><th>${t('descricao')}</th><th>${t('data')}</th><th style="text-align:right">${t('valor')}</th></tr></thead>
           <tbody>${txR.map(tx=>`<tr>
-            <td><div class="flex-cell"><div class="tx-icon ${tx.tipo==='receita'?'tx-in':'tx-out'}"><i class="ti ${tx.tipo==='receita'?'ti-arrow-down-left':'ti-arrow-up-right'}"></i></div><div><div class="fw5">${tx.desc}</div><div class="text-xs text-3">${tx.cat}</div></div></div></td>
+            <td><div class="flex-cell"><div class="tx-icon ${tx.tipo==='receita'?'tx-in':'tx-out'}"><i class="ti ${tx.tipo==='receita'?'ti-arrow-down-left':'ti-arrow-up-right'}"></i></div><div><div class="fw5">${tx.descricao}</div><div class="text-xs text-3">${tx.cat}</div></div></div></td>
             <td class="text-2 nowrap">${fmtDate(tx.data)}</td>
             <td class="text-right fw6" style="color:${tx.tipo==='receita'?'#16a34a':'#dc2626'};font-family:monospace">${tx.tipo==='receita'?'+':'-'}${fmt(tx.valor)}</td>
           </tr>`).join('')}</tbody>
@@ -719,7 +728,7 @@ function pgDashboard(){
       ${fiscalAb.slice(0,4).map(f=>{
         const dias=daysUntil(f.venc);const urg=dias!==null&&dias<=5;
         return`<div class="stat-row">
-          <div><div class="fw5 text-sm">${f.desc}</div><div class="text-xs text-3">Venc. ${fmtDate(f.venc)}</div></div>
+          <div><div class="fw5 text-sm">${f.descricao}</div><div class="text-xs text-3">Venc. ${fmtDate(f.venc)}</div></div>
           <div class="text-right"><div class="fw6 text-sm">${fmt(f.valor)}</div><span class="badge ${urg?'badge-red':'badge-amber'}">${urg?t('urgente'):t('pendente')}</span></div>
         </div>`;
       }).join('')||`<div class="empty-sm"><i class="ti ti-circle-check" style="color:#16a34a"></i> Tudo em dia</div>`}
@@ -765,7 +774,7 @@ function pgFinanceiro(){
   let txs=txEst().slice().sort((a,b)=>b.data.localeCompare(a.data));
   if(FIN_TIPO!=='todas')txs=txs.filter(x=>x.tipo===FIN_TIPO);
   if(FIN_CAT)txs=txs.filter(x=>x.cat===FIN_CAT);
-  if(SEARCH)txs=txs.filter(x=>safeStr(x.desc).includes(SEARCH)||safeStr(x.cat).includes(SEARCH));
+  if(SEARCH)txs=txs.filter(x=>safeStr(x.descricao).includes(SEARCH)||safeStr(x.cat).includes(SEARCH));
   const dias=parseInt(FIN_PERIODO);
   if(dias>0){const c=new Date();c.setDate(c.getDate()-dias);const cs=c.toISOString().slice(0,10);txs=txs.filter(x=>x.data>=cs);}
   const tR=txs.filter(x=>x.tipo==='receita').reduce((s,x)=>s+Number(x.valor),0);
@@ -803,7 +812,7 @@ function pgFinanceiro(){
         <tbody>
         ${txs.length?txs.map(tx=>`<tr>
           <td class="nowrap text-2 text-sm">${fmtDate(tx.data)}</td>
-          <td><div class="fw5">${tx.desc}</div>${tx.obs?`<div class="text-xs text-3">${tx.obs}</div>`:''}</td>
+          <td><div class="fw5">${tx.descricao}</div>${tx.obs?`<div class="text-xs text-3">${tx.obs}</div>`:''}</td>
           <td class="hide-sm"><span class="badge badge-gray">${tx.cat}</span></td>
           <td class="hide-sm"><span class="badge ${tx.tipo==='receita'?'badge-green':'badge-red'}">${tx.tipo==='receita'?t('receita'):t('despesa')}</span></td>
           <td class="text-right fw6 nowrap" style="color:${tx.tipo==='receita'?'#16a34a':'#dc2626'};font-family:monospace;font-size:13px">${tx.tipo==='receita'?'+':'-'}${fmt(tx.valor)}</td>
@@ -922,13 +931,13 @@ function pgFluxo(){
     <div class="card">
       <div class="card-header"><div class="card-title">Entradas recentes</div></div>
       <div class="table-wrap"><table><thead><tr><th>${t('descricao')}</th><th>${t('data')}</th><th style="text-align:right">${t('valor')}</th></tr></thead>
-      <tbody>${txEst().filter(x=>x.tipo==='receita').sort((a,b)=>b.data.localeCompare(a.data)).slice(0,6).map(x=>`<tr><td class="fw5">${x.desc}</td><td class="text-2 text-sm">${fmtDate(x.data)}</td><td class="text-right fw6" style="color:#16a34a;font-family:monospace;font-size:13px">${fmt(x.valor)}</td></tr>`).join('')}</tbody>
+      <tbody>${txEst().filter(x=>x.tipo==='receita').sort((a,b)=>b.data.localeCompare(a.data)).slice(0,6).map(x=>`<tr><td class="fw5">${x.descricao}</td><td class="text-2 text-sm">${fmtDate(x.data)}</td><td class="text-right fw6" style="color:#16a34a;font-family:monospace;font-size:13px">${fmt(x.valor)}</td></tr>`).join('')}</tbody>
       </table></div>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">Saídas pendentes</div></div>
       <div class="table-wrap"><table><thead><tr><th>${t('descricao')}</th><th>${t('vencimento')}</th><th style="text-align:right">${t('valor')}</th></tr></thead>
-      <tbody>${fiscal.map(f=>`<tr><td class="fw5">${f.desc}</td><td class="text-2 text-sm">${fmtDate(f.venc)}</td><td class="text-right fw6" style="color:#dc2626;font-family:monospace;font-size:13px">${fmt(f.valor)}</td></tr>`).join('')||`<tr><td colspan="3"><div class="empty-sm">Sem saídas pendentes</div></td></tr>`}</tbody>
+      <tbody>${fiscal.map(f=>`<tr><td class="fw5">${f.descricao}</td><td class="text-2 text-sm">${fmtDate(f.venc)}</td><td class="text-right fw6" style="color:#dc2626;font-family:monospace;font-size:13px">${fmt(f.valor)}</td></tr>`).join('')||`<tr><td colspan="3"><div class="empty-sm">Sem saídas pendentes</div></td></tr>`}</tbody>
       </table></div>
     </div>
   </div>`;
@@ -1302,7 +1311,7 @@ function pgCardapio(){
       return`<tr>
         <td class="fw5">${c.nome}</td>
         <td class="hide-sm"><span class="badge badge-gray">${c.cat}</span></td>
-        <td class="hide-sm text-2 text-sm">${c.desc||'—'}</td>
+        <td class="hide-sm text-2 text-sm">${c.descricao||'—'}</td>
         <td class="fw6" style="font-family:monospace;font-size:13px">${fmt(c.preco)}</td>
         <td class="hide-sm text-2" style="font-family:monospace;font-size:13px">${fmt(c.custo)}</td>
         <td><span class="badge ${m>=50?'badge-green':m>=30?'badge-blue':'badge-red'}">${fmtNum(m,1)}%</span></td>
@@ -1383,7 +1392,7 @@ async function deletarCardapio(id){
 // ══════════════════════════════════════════
 function pgFiscal(){
   let lista=(LOCAL.fiscal||[]).filter(f=>f.est_id===EST);
-  if(SEARCH)lista=lista.filter(f=>safeStr(f.desc).includes(SEARCH));
+  if(SEARCH)lista=lista.filter(f=>safeStr(f.descricao).includes(SEARCH));
   const pendente=lista.filter(f=>f.status==='aberto').reduce((s,f)=>s+Number(f.valor),0);
   const pago=lista.filter(f=>f.status==='pago').reduce((s,f)=>s+Number(f.valor),0);
   return`
@@ -1400,7 +1409,7 @@ function pgFiscal(){
       const urg=f.status==='aberto'&&dias!==null&&dias<=5;
       const diasTxt=dias===null?'':dias<0?Math.abs(dias)+' '+t('em_atraso'):dias===0?t('hoje'):dias+' '+t('dias_restantes');
       return`<tr>
-        <td class="fw5">${f.desc}</td>
+        <td class="fw5">${f.descricao}</td>
         <td class="hide-sm"><span class="badge badge-gray">${f.tipo}</span></td>
         <td class="nowrap">${fmtDate(f.venc)}</td>
         <td class="hide-sm" style="color:${urg||diasTxt.includes(t('em_atraso'))?'#dc2626':'var(--text-2)'};font-weight:${urg?600:400};font-size:12px">${diasTxt}</td>
@@ -1980,16 +1989,42 @@ function wzStep2(){
   </div>`;
 }
 
+function wzSelecionarTema(v){
+  WZ.theme=v;
+  applyTheme(v);
+  document.querySelectorAll('.wz-tema-btn').forEach(b=>{
+    const active=b.getAttribute('data-tema')===v;
+    b.style.border='2px solid '+(active?'var(--accent)':'var(--border)');
+    b.style.background=active?'var(--accent-light)':'var(--surface)';
+    b.querySelector('i').style.color=active?'var(--accent)':'var(--text-2)';
+    b.querySelector('span').style.color=active?'var(--accent)':'var(--text-2)';
+  });
+}
+
+function wzSelecionarCor(hex){
+  WZ.cor=hex;
+  document.documentElement.style.setProperty('--accent',hex);
+  document.documentElement.style.setProperty('--accent-dark',hex);
+  const isDark=document.body.getAttribute('data-theme')==='dark';
+  document.documentElement.style.setProperty('--accent-light',isDark?hex+'30':hex+'18');
+  document.documentElement.style.setProperty('--accent-text',isDark?hex+'dd':hex);
+  document.querySelectorAll('.wz-cor-btn').forEach(b=>{
+    const active=b.getAttribute('data-cor')===hex;
+    b.style.border='2px solid '+(active?hex:'var(--border)');
+    b.style.background=active?hex+'18':'var(--surface)';
+  });
+}
+
 function wzStep3(){
   return `
   <div class="wz-step-title">Como você prefere o visual?</div>
-  <div class="wz-step-sub">Escolha o tema e a cor principal do sistema</div>
+  <div class="wz-step-sub">Escolha o tema e a cor — a mudança é imediata!</div>
   <div style="max-width:480px;margin:0 auto">
     <div style="margin-bottom:1.5rem">
       <div class="form-label" style="margin-bottom:.75rem">Tema</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
         ${[['dark','ti-moon','Escuro'],['light','ti-sun','Claro'],['system','ti-device-laptop','Sistema']].map(([v,ic,lb])=>`
-        <button onclick="WZ.theme='${v}';document.querySelectorAll('.wz-tema-btn').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')" class="wz-tema-btn ${WZ.theme===v?'sel':''}" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:1rem;border:2px solid ${WZ.theme===v?'var(--accent)':'var(--border)'};border-radius:var(--radius-lg);background:${WZ.theme===v?'var(--accent-light)':'var(--surface)'};cursor:pointer;transition:all .15s">
+        <button onclick="wzSelecionarTema('${v}')" class="wz-tema-btn" data-tema="${v}" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:1rem;border:2px solid ${WZ.theme===v?'var(--accent)':'var(--border)'};border-radius:var(--radius-lg);background:${WZ.theme===v?'var(--accent-light)':'var(--surface)'};cursor:pointer;transition:all .15s;font-family:inherit">
           <i class="ti ${ic}" style="font-size:26px;color:${WZ.theme===v?'var(--accent)':'var(--text-2)'}"></i>
           <span style="font-size:13px;font-weight:500;color:${WZ.theme===v?'var(--accent)':'var(--text-2)'}">${lb}</span>
         </button>`).join('')}
@@ -1999,7 +2034,7 @@ function wzStep3(){
       <div class="form-label" style="margin-bottom:.75rem">Cor de destaque</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
         ${CORES.map(c=>`
-        <button onclick="WZ.cor='${c.hex}';document.querySelectorAll('.wz-cor-btn').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');document.documentElement.style.setProperty('--accent','${c.hex}')" class="wz-cor-btn ${WZ.cor===c.hex?'sel':''}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:.75rem .5rem;border:2px solid ${WZ.cor===c.hex?c.hex:'var(--border)'};border-radius:var(--radius-lg);background:${WZ.cor===c.hex?c.hex+'18':'var(--surface)'};cursor:pointer;transition:all .15s">
+        <button onclick="wzSelecionarCor('${c.hex}')" class="wz-cor-btn" data-cor="${c.hex}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:.75rem .5rem;border:2px solid ${WZ.cor===c.hex?c.hex:'var(--border)'};border-radius:var(--radius-lg);background:${WZ.cor===c.hex?c.hex+'18':'var(--surface)'};cursor:pointer;transition:all .15s;font-family:inherit">
           <div style="width:28px;height:28px;border-radius:50%;background:${c.hex}"></div>
           <span style="font-size:11px;font-weight:500;color:var(--text-2)">${c.label}</span>
         </button>`).join('')}
@@ -2036,7 +2071,7 @@ function wzStep4(){
         <div class="wz-mod-check ${sel?'checked':''}" id="wzchk_${m.id}"><i class="ti ti-check" style="font-size:11px;color:#fff"></i></div>
         <i class="ti ${m.icon}" style="font-size:20px;margin-bottom:4px;color:${sel?'var(--accent)':'var(--text-3)'}"></i>
         <div style="font-size:13px;font-weight:500">${m.label}</div>
-        <div style="font-size:11px;color:var(--text-3);margin-top:2px">${m.desc}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px">${m.descricao||m.desc||""}</div>
       </button>`;
     }).join('')}
   </div>`;
@@ -2171,6 +2206,7 @@ function wzFinish(){
   renderEstSelect();
   hideWizard();
   document.getElementById('bottomNav').style.display='flex';
+  renderAmanda();
   toast('Bem-vindo ao GestãoOS! 🎉','success',4000);
   nav('dashboard');
 }
@@ -2225,4 +2261,244 @@ async function start(){
   showAuthScreen('login');
 }
 
-start();
+// ══════════════════════════════════════════
+// AMANDA — Assistente IA (Groq)
+// ══════════════════════════════════════════
+const AMANDA_CFG = {
+  key: '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',
+  model: 'llama-3.3-70b-versatile',
+  name: 'Amanda',
+};
+
+let amandaOpen = false;
+let amandaMsgs = [];
+let amandaTyping = false;
+
+function getAmandaSystemPrompt() {
+  const lang = CFG.lang || 'pt-BR';
+  const nomeNeg = LOCAL.estabelecimentos?.[0]?.nome || CFG.nome || 'seu negócio';
+  const rec = totalR(), desp = totalD(), lucro = rec - desp;
+  const estqAlerta = (LOCAL.estoque||[]).filter(e=>Number(e.qtd)<=Number(e.min)).length;
+  const fiscalAberto = (LOCAL.fiscal||[]).filter(f=>f.status==='aberto').length;
+  const nFuncs = (LOCAL.funcionarios||[]).filter(f=>f.status==='ativo').length;
+  const nClientes = (LOCAL.clientes||[]).length;
+
+  const idiomas = {'pt-BR':'português brasileiro','en':'English','es':'español','fr':'français'};
+  const idioma = idiomas[lang] || 'português brasileiro';
+
+  return `Você é Amanda, assistente virtual do sistema GestãoOS para o estabelecimento "${nomeNeg}".
+
+PERSONALIDADE: Amigável, simpática e prestativa. Responde saudações como "bom dia", "oi", "olá" de forma calorosa. Use emojis com moderação (1-2 por mensagem). Seja direta e objetiva nas respostas técnicas.
+
+IDIOMA: Responda SEMPRE em ${idioma}. Se o usuário mudar de idioma, acompanhe.
+
+CONTEXTO ATUAL DO NEGÓCIO:
+- Receita total: R$ ${rec.toFixed(2)}
+- Despesas totais: R$ ${desp.toFixed(2)}
+- Lucro líquido: R$ ${lucro.toFixed(2)}
+- Itens com estoque abaixo do mínimo: ${estqAlerta}
+- Obrigações fiscais abertas: ${fiscalAberto}
+- Funcionários ativos: ${nFuncs}
+- Clientes cadastrados: ${nClientes}
+
+ESCOPO: Você APENAS responde sobre:
+1. Como usar o sistema GestãoOS (módulos, funcionalidades, navegação)
+2. Dúvidas sobre os dados do negócio acima
+3. Saudações e perguntas gerais simples
+
+MÓDULOS DO SISTEMA:
+- Dashboard: visão geral com métricas e alertas
+- Financeiro: lançar receitas e despesas, filtrar por período e categoria
+- DRE: demonstrativo de resultados com todas as contas
+- Fluxo de caixa: projeção de entradas e saídas
+- Estoque: cadastrar itens, ajustar quantidade (entrada/saída), alertas de estoque baixo
+- Funcionários: cadastro, cargo, salário, status (ativo/férias/afastado)
+- Clientes: cadastro, histórico de visitas, total gasto, nível (Novo/Fiel/VIP)
+- Fornecedores: cadastro com prazo de pagamento e contato
+- Cardápio: itens com preço, custo e cálculo de margem automático
+- Fiscal: impostos e obrigações com controle de vencimento e pagamento
+- Metas: definir e acompanhar objetivos com progresso visual
+- Relatórios: análises de receita, despesas, ranking de clientes e margem do cardápio
+- Configurações: tema, idioma, moeda, estabelecimentos e banco de dados
+
+SE perguntarem algo FORA do escopo: responda educadamente que você é especializada no GestãoOS e não pode ajudar com esse assunto, mas que fica feliz em ajudar com o sistema.
+
+Seja concisa. Máximo 3-4 parágrafos por resposta.`;
+}
+
+function amandaToggle() {
+  amandaOpen = !amandaOpen;
+  const popup = document.getElementById('amanda-popup');
+  const btn = document.getElementById('amanda-btn');
+  if (!popup) return;
+  popup.style.display = amandaOpen ? 'flex' : 'none';
+  btn.style.transform = amandaOpen ? 'rotate(45deg) scale(1.1)' : 'scale(1)';
+  if (amandaOpen && amandaMsgs.length === 0) {
+    // Send welcome message
+    const hora = new Date().getHours();
+    const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+    const nomeNeg = LOCAL.estabelecimentos?.[0]?.nome || CFG.nome || 'seu negócio';
+    amandaAddMsg('assistant', `${saudacao}! 😊 Sou a Amanda, sua assistente no GestãoOS. Estou aqui para ajudar com o sistema **${nomeNeg}**.\n\nComo posso te ajudar hoje?`);
+  }
+  if (amandaOpen) {
+    setTimeout(() => {
+      const input = document.getElementById('amanda-input');
+      if (input) input.focus();
+    }, 100);
+  }
+}
+
+function amandaAddMsg(role, content) {
+  amandaMsgs.push({ role, content });
+  renderAmandaMsgs();
+}
+
+function renderAmandaMsgs() {
+  const list = document.getElementById('amanda-msgs');
+  if (!list) return;
+  list.innerHTML = amandaMsgs.map(m => {
+    const isUser = m.role === 'user';
+    const text = m.content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+    return `<div style="display:flex;gap:8px;margin-bottom:12px;${isUser?'flex-direction:row-reverse':''}">
+      ${!isUser?`<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">AM</div>`:''}
+      <div style="max-width:78%;padding:.6rem .875rem;border-radius:${isUser?'12px 4px 12px 12px':'4px 12px 12px 12px'};background:${isUser?'var(--accent)':'var(--bg)'};color:${isUser?'#fff':'var(--text)'};font-size:13px;line-height:1.6;border:${isUser?'none':'1px solid var(--border)'}">
+        ${text}
+      </div>
+    </div>`;
+  }).join('') + (amandaTyping ? `
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">AM</div>
+      <div style="padding:.6rem .875rem;border-radius:4px 12px 12px 12px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;gap:4px">
+        ${[0,1,2].map(i=>`<div style="width:6px;height:6px;border-radius:50%;background:var(--text-3);animation:amandaDot 1.2s ${i*0.2}s infinite"></div>`).join('')}
+      </div>
+    </div>` : '');
+  list.scrollTop = list.scrollHeight;
+}
+
+async function amandaSend() {
+  const input = document.getElementById('amanda-input');
+  if (!input) return;
+  const msg = input.value.trim();
+  if (!msg || amandaTyping) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  amandaAddMsg('user', msg);
+  amandaTyping = true;
+  renderAmandaMsgs();
+
+  // Build messages for API
+  const messages = [
+    { role: 'system', content: getAmandaSystemPrompt() },
+    ...amandaMsgs.slice(-12).filter(m => m.role !== 'system'),
+  ];
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${AMANDA_CFG.key}`,
+      },
+      body: JSON.stringify({
+        model: AMANDA_CFG.model,
+        messages,
+        max_tokens: 600,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'Erro na API');
+    }
+
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || 'Desculpe, não consegui processar sua mensagem.';
+    amandaTyping = false;
+    amandaAddMsg('assistant', reply);
+  } catch(e) {
+    amandaTyping = false;
+    console.error('Amanda error:', e);
+    amandaAddMsg('assistant', `Ops, tive um probleminha técnico 😅 Tente novamente em instantes.\n\n_Erro: ${e.message}_`);
+    renderAmandaMsgs();
+  }
+}
+
+function amandaKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    amandaSend();
+  }
+  // Auto-resize textarea
+  e.target.style.height = 'auto';
+  e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+}
+
+function amandaClear() {
+  amandaMsgs = [];
+  amandaOpen = false;
+  amandaToggle();
+}
+
+function renderAmanda() {
+  // Remove existing
+  const existing = document.getElementById('amanda-root');
+  if (existing) existing.remove();
+
+  const root = document.createElement('div');
+  root.id = 'amanda-root';
+  root.innerHTML = `
+  <style>
+    @keyframes amandaDot{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+    @keyframes amandaPopup{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    #amanda-popup{animation:amandaPopup .2s ease}
+    #amanda-btn{transition:transform .2s ease,box-shadow .2s ease}
+    #amanda-btn:hover{box-shadow:0 6px 24px rgba(0,0,0,.25)!important}
+    #amanda-input:focus{outline:none}
+  </style>
+
+  <!-- POPUP -->
+  <div id="amanda-popup" style="display:none;position:fixed;bottom:90px;right:1.25rem;width:340px;max-width:calc(100vw - 2rem);height:520px;max-height:calc(100vh - 120px);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.18);z-index:500;flex-direction:column;overflow:hidden">
+
+    <!-- Header -->
+    <div style="padding:.875rem 1rem;background:var(--accent);display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">AM</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:#fff">Amanda</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#4ade80"></div>
+          Assistente GestãoOS
+        </div>
+      </div>
+      <button onclick="amandaClear()" style="background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:11px;font-family:inherit">Limpar</button>
+      <button onclick="amandaToggle()" style="background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">×</button>
+    </div>
+
+    <!-- Messages -->
+    <div id="amanda-msgs" style="flex:1;overflow-y:auto;padding:1rem;scroll-behavior:smooth"></div>
+
+    <!-- Input -->
+    <div style="padding:.75rem;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0">
+      <div style="display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:.5rem .75rem">
+        <textarea id="amanda-input" rows="1" placeholder="Pergunte algo para a Amanda..." onkeydown="amandaKeydown(event)" style="flex:1;border:none;background:transparent;font-size:13px;font-family:inherit;color:var(--text);resize:none;line-height:1.5;max-height:100px;overflow-y:auto"></textarea>
+        <button onclick="amandaSend()" style="width:32px;height:32px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s" title="Enviar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+      <div style="text-align:center;margin-top:6px;font-size:10px;color:var(--text-3)">Amanda pode cometer erros. Verifique informações importantes.</div>
+    </div>
+  </div>
+
+  <!-- FAB BUTTON -->
+  <button id="amanda-btn" onclick="amandaToggle()" style="position:fixed;bottom:1.25rem;right:1.25rem;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:499" title="Amanda - Assistente IA">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </button>`;
+
+  document.body.appendChild(root);
+}
