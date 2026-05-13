@@ -392,6 +392,58 @@ async function loadAll(){
   }catch(e){console.error(e);}
 }
 
+// Credenciais do Banco 2 para sincronização
+const BANCO2 = {
+  url: 'https://xdghoymizehyhtefidjs.supabase.co',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkZ2hveW1pemVoeWh0ZWZpZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MzA2NjksImV4cCI6MjA5NDEwNjY2OX0.DlOAA6VHdEga15qQs523wGjHSGAzxAE5WBNQjwLt4LQ'
+};
+
+async function sincronizarClientes(){
+  const btn=document.getElementById('btnSync');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader spin"></i> Sincronizando...';}
+  try{
+    // Busca novos cadastros do Banco 2
+    const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    const banco2=createClient(BANCO2.url,BANCO2.key);
+    const{data:novos,error}=await banco2.from('novos_cadastros').select('*').eq('processado',false).order('created_at',{ascending:true});
+    if(error)throw error;
+    if(!novos||novos.length===0){toast('Nenhum cadastro novo para sincronizar','info');if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-refresh"></i> Sincronizar clientes';}return;}
+
+    // Busca plano Free no Banco 1
+    const{data:planoFree}=await supa.from('planos').select('id').eq('nome','Free').single();
+    let importados=0;
+
+    for(const novo of novos){
+      // Verifica se já existe
+      const{data:existe}=await supa.from('clientes').select('id').eq('email',novo.email).maybeSingle();
+      if(!existe){
+        const trialAte=new Date();trialAte.setDate(trialAte.getDate()+14);
+        const{error:insErr}=await supa.from('clientes').insert({
+          nome:novo.nome||novo.email.split('@')[0],
+          email:novo.email,
+          plano_id:planoFree?.id??null,
+          status:'trial',
+          trial_ate:trialAte.toISOString().slice(0,10),
+          observacoes:`Cadastro automático. User ID: ${novo.user_id}`,
+          created_at:novo.created_at,
+          updated_at:new Date().toISOString(),
+        });
+        if(!insErr)importados++;
+      }
+      // Marca como processado no Banco 2
+      await banco2.from('novos_cadastros').update({processado:true}).eq('id',novo.id);
+    }
+
+    await loadAll();
+    toast(`✓ ${importados} novo(s) cliente(s) importado(s)!`,'success');
+    nav('overview');
+  }catch(e){
+    console.error('Sync error:',e);
+    toast('Erro ao sincronizar: '+e.message,'error');
+  }
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-refresh"></i> Sincronizar clientes';}
+}
+
 // ═══════════════════════════════
 // PAGES
 // ═══════════════════════════════
@@ -407,6 +459,10 @@ function pgOverview(){
   const ultimosPagamentos=DATA.pagamentos.slice(0,5);
 
   return`
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+    <div><div style="font-size:18px;font-weight:700">Dashboard</div><div style="font-size:12px;color:var(--text-2)">Visão geral do GestãoOS</div></div>
+    <button id="btnSync" class="btn btn-primary" onclick="sincronizarClientes()"><i class="ti ti-refresh"></i> Sincronizar clientes</button>
+  </div>
   <div class="grid-4 mb-3">
     <div class="metric-card"><div class="metric-header"><div class="metric-label">Clientes ativos</div><div class="metric-icon" style="background:var(--accent-light)"><i class="ti ti-users" style="color:var(--accent)"></i></div></div><div class="metric-value" style="color:var(--accent)">${ativos}</div><div class="metric-delta">${trial} em trial</div></div>
     <div class="metric-card"><div class="metric-header"><div class="metric-label">MRR do mês</div><div class="metric-icon" style="background:var(--green-bg)"><i class="ti ti-cash" style="color:var(--green)"></i></div></div><div class="metric-value" style="color:var(--green)">${fmt(mrr)}</div><div class="metric-delta">receita recorrente</div></div>
