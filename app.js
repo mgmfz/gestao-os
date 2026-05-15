@@ -1,4 +1,4 @@
-/* GestãoOS v4.0 — i18n + Temas + Mobile */
+/* MireneOS v4.0 — i18n + Temas + Mobile */
 'use strict';
 
 // ══════════════════════════════════════════
@@ -339,7 +339,7 @@ function buildAuthHTML(tab) {
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);width:100%;max-width:420px;padding:2rem;box-shadow:var(--shadow-md)">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.75rem">
       <div style="width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-building-store" style="color:#fff;font-size:20px"></i></div>
-      <div><div style="font-size:18px;font-weight:700;color:var(--text)">GestãoOS</div><div style="font-size:12px;color:var(--text-2)">${isLogin?'Entre na sua conta':'Crie sua conta grátis'}</div></div>
+      <div><div style="font-size:18px;font-weight:700;color:var(--text)">MireneOS</div><div style="font-size:12px;color:var(--text-2)">${isLogin?'Entre na sua conta':'Crie sua conta grátis'}</div></div>
     </div>
     <div style="display:flex;background:var(--bg);border-radius:var(--radius);padding:3px;gap:2px;margin-bottom:1.5rem;border:1px solid var(--border)">
       <button onclick="showAuthScreen('login')" style="flex:1;padding:.4rem;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:inherit;transition:all .15s;background:${isLogin?'var(--surface)':'transparent'};color:${isLogin?'var(--text)':'var(--text-2)'}">Entrar</button>
@@ -444,7 +444,7 @@ function usarDemo() {
 // CONFIG & STATE
 // ══════════════════════════════════════════
 let CFG = {
-  nome:'GestãoOS', tipo:'restaurante', responsavel:'Admin', email:'',
+  nome:'MireneOS', tipo:'restaurante', responsavel:'Admin', email:'',
   moeda:'BRL', lang:'pt-BR', theme:'light', accentColor:'#2563EB',
   modulos:['dashboard','financeiro','dre','fluxo','estoque','funcionarios','clientes','fornecedores','cardapio','fiscal','metas','relatorios','config'],
   url:'https://xdghoymizehyhtefidjs.supabase.co',
@@ -471,9 +471,9 @@ function buildDemoData() {
     const nR = Math.floor(Math.random()*3)+1;
     for (let i=0;i<nR;i++) {
       const c=catR[Math.floor(Math.random()*catR.length)];
-      LOCAL.transacoes.push({id:'t'+(id++),est_id:'e1',tipo:'receita',desc:c,cat:c,valor:Math.round((Math.random()*2000+400)*100)/100,data:ds,obs:''});
+      LOCAL.transacoes.push({id:'t'+(id++),est_id:'e1',tipo:'receita',descricao:c,cat:c,valor:Math.round((Math.random()*2000+400)*100)/100,data:ds,obs:''});
     }
-    if (d%3===0){const c=catD[Math.floor(Math.random()*catD.length)];LOCAL.transacoes.push({id:'t'+(id++),est_id:'e1',tipo:'despesa',desc:'Pagamento '+c,cat:c,valor:Math.round((Math.random()*1200+200)*100)/100,data:ds,obs:''});}
+    if (d%3===0){const c=catD[Math.floor(Math.random()*catD.length)];LOCAL.transacoes.push({id:'t'+(id++),est_id:'e1',tipo:'despesa',descricao:'Pagamento '+c,cat:c,valor:Math.round((Math.random()*1200+200)*100)/100,data:ds,obs:''});}
   }
   LOCAL.estoque=[
     {id:'s1',est_id:'e1',nome:'Farinha de trigo',cat:'Insumos',qtd:45,min:20,custo:4.5,unidade:'kg'},
@@ -502,19 +502,19 @@ function buildDemoData() {
     {id:'fr3',est_id:'e1',nome:'Bebidas Express',cat:'Bebidas',contato:'Carlos Ramos',tel:'(11) 5555-3333',email:'',prazo_pagamento:7,status:'ativo'},
   ];
   LOCAL.cardapio=[
-    {id:'k1',est_id:'e1',nome:'Pizza Margherita G',cat:'Pizzas',preco:55.90,custo:18,ativo:true,desc:'Molho, mussarela, manjericão'},
-    {id:'k2',est_id:'e1',nome:'Pizza Calabresa G',cat:'Pizzas',preco:59.90,custo:21,ativo:true,desc:'Molho, calabresa, cebola'},
-    {id:'k3',est_id:'e1',nome:'Pizza 4 Queijos G',cat:'Pizzas',preco:64.90,custo:24,ativo:true,desc:'Mussarela, parmesão, provolone, catupiry'},
-    {id:'k4',est_id:'e1',nome:'Refrigerante Lata',cat:'Bebidas',preco:7.00,custo:2.5,ativo:true,desc:'350ml'},
-    {id:'k5',est_id:'e1',nome:'Suco Natural 500ml',cat:'Bebidas',preco:14.00,custo:4,ativo:true,desc:'Laranja, limão, maracujá'},
-    {id:'k6',est_id:'e1',nome:'Brownie c/ Sorvete',cat:'Sobremesas',preco:18.00,custo:6,ativo:false,desc:'Brownie quente com sorvete'},
+    {id:'k1',est_id:'e1',nome:'Pizza Margherita G',cat:'Pizzas',preco:55.90,custo:18,ativo:true,descricao:'Molho, mussarela, manjericão'},
+    {id:'k2',est_id:'e1',nome:'Pizza Calabresa G',cat:'Pizzas',preco:59.90,custo:21,ativo:true,descricao:'Molho, calabresa, cebola'},
+    {id:'k3',est_id:'e1',nome:'Pizza 4 Queijos G',cat:'Pizzas',preco:64.90,custo:24,ativo:true,descricao:'Mussarela, parmesão, provolone, catupiry'},
+    {id:'k4',est_id:'e1',nome:'Refrigerante Lata',cat:'Bebidas',preco:7.00,custo:2.5,ativo:true,descricao:'350ml'},
+    {id:'k5',est_id:'e1',nome:'Suco Natural 500ml',cat:'Bebidas',preco:14.00,custo:4,ativo:true,descricao:'Laranja, limão, maracujá'},
+    {id:'k6',est_id:'e1',nome:'Brownie c/ Sorvete',cat:'Sobremesas',preco:18.00,custo:6,ativo:false,descricao:'Brownie quente com sorvete'},
   ];
   LOCAL.fiscal=[
-    {id:'fi1',est_id:'e1',desc:'ISSQN Março/2026',tipo:'imposto',venc:'2026-04-15',valor:920,status:'pago',pago_em:'2026-04-14'},
-    {id:'fi2',est_id:'e1',desc:'ISSQN Abril/2026',tipo:'imposto',venc:'2026-05-15',valor:950,status:'pago',pago_em:'2026-05-13'},
-    {id:'fi3',est_id:'e1',desc:'ISSQN Maio/2026',tipo:'imposto',venc:'2026-06-15',valor:980,status:'aberto',pago_em:''},
-    {id:'fi4',est_id:'e1',desc:'Simples Nacional Mai/26',tipo:'simples',venc:'2026-05-20',valor:3200,status:'aberto',pago_em:''},
-    {id:'fi5',est_id:'e1',desc:'Aluguel Maio/2026',tipo:'aluguel',venc:'2026-05-10',valor:4500,status:'aberto',pago_em:''},
+    {id:'fi1',est_id:'e1',descricao:'ISSQN Março/2026',tipo:'imposto',venc:'2026-04-15',valor:920,status:'pago',pago_em:'2026-04-14'},
+    {id:'fi2',est_id:'e1',descricao:'ISSQN Abril/2026',tipo:'imposto',venc:'2026-05-15',valor:950,status:'pago',pago_em:'2026-05-13'},
+    {id:'fi3',est_id:'e1',descricao:'ISSQN Maio/2026',tipo:'imposto',venc:'2026-06-15',valor:980,status:'aberto',pago_em:''},
+    {id:'fi4',est_id:'e1',descricao:'Simples Nacional Mai/26',tipo:'simples',venc:'2026-05-20',valor:3200,status:'aberto',pago_em:''},
+    {id:'fi5',est_id:'e1',descricao:'Aluguel Maio/2026',tipo:'aluguel',venc:'2026-05-10',valor:4500,status:'aberto',pago_em:''},
   ];
   LOCAL.metas=[
     {id:'mt1',est_id:'e1',nome:'Faturamento mensal',atual:28450,meta:35000,unidade:'R$',prazo:'2026-05-31',cat:'financeiro'},
@@ -606,8 +606,8 @@ const MOD_DEF = {
 };
 
 function badgeCount(id){
-  if(id==='estoque') return(LOCAL.estoque||[]).filter(e=>e.est_id===EST&&Number(e.qtd)<=Number(e.min)).length||'';
-  if(id==='fiscal') return(LOCAL.fiscal||[]).filter(f=>f.est_id===EST&&f.status==='aberto').length||'';
+  if(id==='estoque') return(LOCAL.estoque||[]).filter(e=>(!e.est_id||e.est_id===EST||e.est_id==='e1')&&Number(e.qtd)<=Number(e.min)).length||'';
+  if(id==='fiscal') return(LOCAL.fiscal||[]).filter(f=>(!f.est_id||f.est_id===EST||f.est_id==='e1')&&f.status==='aberto').length||'';
   return'';
 }
 
@@ -707,17 +707,17 @@ function handleSearch(v){SEARCH=v.toLowerCase();nav(PAGE);}
 // ══════════════════════════════════════════
 function pgDashboard(){
   const rec=totalR(),desp=totalD(),lucro=rec-desp,margem=rec>0?(lucro/rec*100):0;
-  const folha=(LOCAL.funcionarios||[]).filter(f=>f.est_id===EST&&f.status==='ativo').reduce((s,f)=>s+Number(f.salario),0);
+  const folha=(LOCAL.funcionarios||[]).filter(f=>(!f.est_id||f.est_id===EST||f.est_id==='e1')&&f.status==='ativo').reduce((s,f)=>s+Number(f.salario),0);
   const txR=txEst().slice().sort((a,b)=>b.data.localeCompare(a.data)).slice(0,6);
-  const alertaEstq=(LOCAL.estoque||[]).filter(e=>e.est_id===EST&&Number(e.qtd)<=Number(e.min));
-  const fiscalAb=(LOCAL.fiscal||[]).filter(f=>f.est_id===EST&&f.status==='aberto');
+  const alertaEstq=(LOCAL.estoque||[]).filter(e=>(!e.est_id||e.est_id===EST||e.est_id==='e1')&&Number(e.qtd)<=Number(e.min));
+  const fiscalAb=(LOCAL.fiscal||[]).filter(f=>(!f.est_id||f.est_id===EST||f.est_id==='e1')&&f.status==='aberto');
 
   return `
   <div class="metrics-grid mb-3">
     ${metricCard(t('receitas'),fmt(rec),'ti-trending-up','#2563EB','#eff6ff','↑ 8,4% vs. mês anterior','delta-up')}
     ${metricCard(t('despesas'),fmt(desp),'ti-trending-down','#dc2626','#fef2f2','↑ 2,1% vs. mês anterior','delta-down')}
     ${metricCard(t('lucro'),fmt(lucro),'ti-cash',lucro>=0?'#16a34a':'#dc2626','#f0fdf4',t('margem')+': '+fmtNum(margem,1)+'%','delta-neutral')}
-    ${metricCard(t('folha'),fmt(folha),'ti-users','#7c3aed','#f5f3ff',(LOCAL.funcionarios||[]).filter(f=>f.est_id===EST&&f.status==='ativo').length+' '+t('ativos'),'delta-neutral')}
+    ${metricCard(t('folha'),fmt(folha),'ti-users','#7c3aed','#f5f3ff',(LOCAL.funcionarios||[]).filter(f=>(!f.est_id||f.est_id===EST||f.est_id==='e1')&&f.status==='ativo').length+' '+t('ativos'),'delta-neutral')}
   </div>
 
   <div class="grid-2 mb-3">
@@ -760,7 +760,7 @@ function pgDashboard(){
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">${t('metas')}</div><button class="btn btn-ghost btn-sm" onclick="nav('metas')">Ver <i class="ti ti-arrow-right"></i></button></div>
-      ${(LOCAL.metas||[]).filter(m=>m.est_id===EST).slice(0,3).map(m=>{
+      ${(LOCAL.metas||[]).filter(m=>!m.est_id||m.est_id===EST||m.est_id==='e1').slice(0,3).map(m=>{
         const pct=Math.min(100,Math.round(Number(m.atual)/Number(m.meta)*100));
         const cor=pct>=100?'#16a34a':pct>=70?'#2563EB':'#d97706';
         return`<div style="margin-bottom:12px">
@@ -861,7 +861,7 @@ function modalTransacao(editId){
         <div class="form-group"><label class="form-label">${t('tipo')} *</label><select class="form-select" id="tx_tipo"><option value="receita" ${tx?.tipo==='receita'?'selected':''}>${t('receita')}</option><option value="despesa" ${tx?.tipo==='despesa'||!tx?'selected':''}>${t('despesa')}</option></select></div>
         <div class="form-group"><label class="form-label">${t('data')} *</label><input type="date" class="form-input" id="tx_data" value="${tx?.data||today()}"/></div>
       </div>
-      <div class="form-group mb-2"><label class="form-label">${t('descricao')} *</label><input type="text" class="form-input" id="tx_desc" value="${tx?.desc||''}" placeholder="Ex: Vendas do almoço"/></div>
+      <div class="form-group mb-2"><label class="form-label">${t('descricao')} *</label><input type="text" class="form-input" id="tx_desc" value="${tx?.descricao||''}" placeholder="Ex: Vendas do almoço"/></div>
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">${t('valor')} *</label><div class="currency-wrap"><div class="currency-prefix">${MOEDA[CFG.moeda]}</div><input type="number" id="tx_valor" value="${tx?.valor||''}" placeholder="0,00" min="0" step="0.01"/></div></div>
         <div class="form-group"><label class="form-label">${t('categoria')} *</label>
@@ -886,7 +886,7 @@ async function salvarTx(editId){
   if(!desc){toast('Informe a descrição','error');return;}
   if(!valor||valor<=0){toast('Informe um valor válido','error');return;}
   if(!data){toast('Informe a data','error');return;}
-  const row={est_id:EST,tipo,data,desc,cat,valor,obs};
+  const row={est_id:EST,tipo,data,descricao:desc,cat,valor,obs};
   if(editId){
     if(supa&&!isLocal(editId)){const s=await dbUpdate('transacoes',editId,row);if(!s)return;Object.assign(LOCAL.transacoes.find(x=>x.id===editId),s);}
     else Object.assign(LOCAL.transacoes.find(x=>x.id===editId),row);
@@ -946,7 +946,7 @@ function pgDRE(){
 // FLUXO
 // ══════════════════════════════════════════
 function pgFluxo(){
-  const fiscal=(LOCAL.fiscal||[]).filter(f=>f.est_id===EST&&f.status==='aberto');
+  const fiscal=(LOCAL.fiscal||[]).filter(f=>(!f.est_id||f.est_id===EST||f.est_id==='e1')&&f.status==='aberto');
   return`
   <div class="card mb-2">
     <div class="card-header"><div class="card-title">${t('fluxo')} — 14 dias</div></div>
@@ -980,7 +980,9 @@ function renderFluxoChart(){
 // ESTOQUE
 // ══════════════════════════════════════════
 function pgEstoque(){
-  let itens=(LOCAL.estoque||[]).filter(e=>e.est_id===EST);
+  // When logged in with Supabase, filter by EST. In demo mode show all.
+  let itens=(LOCAL.estoque||[]);
+  if(AUTH_USER && EST && !EST.startsWith('e')) itens=itens.filter(e=>e.est_id===EST);
   if(SEARCH)itens=itens.filter(e=>safeStr(e.nome).includes(SEARCH)||safeStr(e.cat).includes(SEARCH));
   itens.sort((a,b)=>a.nome.localeCompare(b.nome));
   const abaixo=itens.filter(e=>Number(e.qtd)<=Number(e.min)).length;
@@ -1092,7 +1094,7 @@ async function deletarEstoque(id){
 // FUNCIONÁRIOS
 // ══════════════════════════════════════════
 function pgFuncionarios(){
-  let lista=(LOCAL.funcionarios||[]).filter(f=>f.est_id===EST);
+  let lista=(LOCAL.funcionarios||[]).filter(f=>!f.est_id||f.est_id===EST||f.est_id==='e1');
   if(SEARCH)lista=lista.filter(f=>safeStr(f.nome).includes(SEARCH)||safeStr(f.cargo).includes(SEARCH));
   const ativos=lista.filter(f=>f.status==='ativo');
   const folha=ativos.reduce((s,f)=>s+Number(f.salario),0);
@@ -1171,7 +1173,7 @@ async function deletarFunc(id){
 // CLIENTES
 // ══════════════════════════════════════════
 function pgClientes(){
-  let lista=(LOCAL.clientes||[]).filter(c=>c.est_id===EST);
+  let lista=(LOCAL.clientes||[]).filter(c=>!c.est_id||c.est_id===EST||c.est_id==='e1');
   if(SEARCH)lista=lista.filter(c=>safeStr(c.nome).includes(SEARCH)||(c.tel||'').includes(SEARCH));
   lista.sort((a,b)=>Number(b.total_gasto)-Number(a.total_gasto));
   return`
@@ -1251,7 +1253,7 @@ async function deletarCliente(id){
 // FORNECEDORES
 // ══════════════════════════════════════════
 function pgFornecedores(){
-  let lista=(LOCAL.fornecedores||[]).filter(f=>f.est_id===EST);
+  let lista=(LOCAL.fornecedores||[]).filter(f=>!f.est_id||f.est_id===EST||f.est_id==='e1');
   if(SEARCH)lista=lista.filter(f=>safeStr(f.nome).includes(SEARCH));
   return`<div class="card"><div class="table-wrap"><table>
     <thead><tr><th>${t('nome')}</th><th class="hide-sm">${t('categoria')}</th><th class="hide-sm">Contato</th><th class="hide-sm">${t('telefone')}</th><th class="hide-sm">Prazo pgto.</th><th>${t('status')}</th><th style="text-align:right"></th></tr></thead>
@@ -1317,7 +1319,7 @@ async function deletarFornecedor(id){
 // CARDÁPIO
 // ══════════════════════════════════════════
 function pgCardapio(){
-  let lista=(LOCAL.cardapio||[]).filter(c=>c.est_id===EST);
+  let lista=(LOCAL.cardapio||[]).filter(c=>!c.est_id||c.est_id===EST||c.est_id==='e1');
   if(SEARCH)lista=lista.filter(c=>safeStr(c.nome).includes(SEARCH));
   lista.sort((a,b)=>a.cat.localeCompare(b.cat)||a.nome.localeCompare(b.nome));
   const ativos=lista.filter(c=>c.ativo);
@@ -1361,7 +1363,7 @@ function modalCardapio(editId){
         <div class="form-group"><label class="form-label">${t('nome')} *</label><input type="text" class="form-input" id="cd_nome" value="${c?.nome||''}"/></div>
         <div class="form-group"><label class="form-label">${t('categoria')}</label><select class="form-select" id="cd_cat">${['Pizzas','Massas','Carnes','Saladas','Lanches','Bebidas','Sucos','Sobremesas','Combos','Outros'].map(x=>`<option ${c?.cat===x?'selected':''}>${x}</option>`).join('')}</select></div>
       </div>
-      <div class="form-group mb-2"><label class="form-label">${t('descricao')}</label><input type="text" class="form-input" id="cd_desc" value="${c?.desc||''}"/></div>
+      <div class="form-group mb-2"><label class="form-label">${t('descricao')}</label><input type="text" class="form-input" id="cd_desc" value="${c?.descricao||''}"/></div>
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">${t('preco')} *</label><div class="currency-wrap"><div class="currency-prefix">${MOEDA[CFG.moeda]}</div><input type="number" id="cd_preco" value="${c?.preco||''}" min="0" step="0.01" oninput="previewMargin()"/></div></div>
         <div class="form-group"><label class="form-label">${t('custo')}</label><div class="currency-wrap"><div class="currency-prefix">${MOEDA[CFG.moeda]}</div><input type="number" id="cd_custo" value="${c?.custo||0}" min="0" step="0.01" oninput="previewMargin()"/></div></div>
@@ -1385,7 +1387,7 @@ async function salvarCardapio(editId){
   const preco=parseFloat(document.getElementById('cd_preco').value)||0;
   if(!nome){toast('Informe o nome','error');return;}
   if(!preco){toast('Informe o preço','error');return;}
-  const row={est_id:EST,nome,cat:document.getElementById('cd_cat').value,desc:document.getElementById('cd_desc').value.trim(),preco,custo:parseFloat(document.getElementById('cd_custo').value)||0,ativo:editId?(LOCAL.cardapio.find(c=>c.id===editId)?.ativo??true):true};
+  const row={est_id:EST,nome,cat:document.getElementById('cd_cat').value,descricao:document.getElementById('cd_desc').value.trim(),preco,custo:parseFloat(document.getElementById('cd_custo').value)||0,ativo:editId?(LOCAL.cardapio.find(c=>c.id===editId)?.ativo??true):true};
   if(editId){
     if(supa&&!isLocal(editId)){const s=await dbUpdate('cardapio',editId,row);if(!s)return;Object.assign(LOCAL.cardapio.find(c=>c.id===editId),s);}
     else Object.assign(LOCAL.cardapio.find(c=>c.id===editId),row);
@@ -1416,7 +1418,7 @@ async function deletarCardapio(id){
 // FISCAL
 // ══════════════════════════════════════════
 function pgFiscal(){
-  let lista=(LOCAL.fiscal||[]).filter(f=>f.est_id===EST);
+  let lista=(LOCAL.fiscal||[]).filter(f=>!f.est_id||f.est_id===EST||f.est_id==='e1');
   if(SEARCH)lista=lista.filter(f=>safeStr(f.descricao).includes(SEARCH));
   const pendente=lista.filter(f=>f.status==='aberto').reduce((s,f)=>s+Number(f.valor),0);
   const pago=lista.filter(f=>f.status==='pago').reduce((s,f)=>s+Number(f.valor),0);
@@ -1458,7 +1460,7 @@ function modalFiscal(editId){
     <div class="modal-header"><div class="modal-title">${f?t('editar'):t('novo_fiscal')}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
       <div class="form-row cols-2">
-        <div class="form-group"><label class="form-label">${t('descricao')} *</label><input type="text" class="form-input" id="fi_desc" value="${f?.desc||''}" placeholder="Ex: ISSQN Maio/2026"/></div>
+        <div class="form-group"><label class="form-label">${t('descricao')} *</label><input type="text" class="form-input" id="fi_desc" value="${f?.descricao||''}" placeholder="Ex: ISSQN Maio/2026"/></div>
         <div class="form-group"><label class="form-label">${t('tipo')}</label><select class="form-select" id="fi_tipo">${['imposto','simples','aluguel','seguro','contabilidade','outro'].map(x=>`<option ${f?.tipo===x?'selected':''}>${x}</option>`).join('')}</select></div>
       </div>
       <div class="form-row cols-2">
@@ -1474,7 +1476,7 @@ async function salvarFiscal(editId){
   const valor=parseFloat(document.getElementById('fi_val').value)||0;
   const venc=document.getElementById('fi_venc').value;
   if(!desc||!valor||!venc){toast('Preencha todos os campos','error');return;}
-  const row={est_id:EST,desc,tipo:document.getElementById('fi_tipo').value,valor,venc,status:'aberto',pago_em:''};
+  const row={est_id:EST,descricao:desc,tipo:document.getElementById('fi_tipo').value,valor,venc,status:'aberto',pago_em:''};
   if(editId){
     if(supa&&!isLocal(editId)){const s=await dbUpdate('fiscal',editId,row);if(!s)return;Object.assign(LOCAL.fiscal.find(f=>f.id===editId),s);}
     else Object.assign(LOCAL.fiscal.find(f=>f.id===editId),row);
@@ -1505,7 +1507,7 @@ async function deletarFiscal(id){
 // METAS
 // ══════════════════════════════════════════
 function pgMetas(){
-  const metas=(LOCAL.metas||[]).filter(m=>m.est_id===EST);
+  const metas=(LOCAL.metas||[]).filter(m=>!m.est_id||m.est_id===EST||m.est_id==='e1');
   return`<div class="grid-3">${metas.length?metas.map(m=>{
     const pct=Math.min(100,Math.round(Number(m.atual)/Number(m.meta)*100));
     const dias=daysUntil(m.prazo);
@@ -1595,7 +1597,7 @@ function pgRelatorios(){
     </div>
     <div class="card"><div class="card-header"><div class="card-title">${t('ranking_clientes')}</div></div>
       <div class="table-wrap"><table><thead><tr><th>Cliente</th><th style="text-align:center">${t('visitas')}</th><th style="text-align:right">Total</th></tr></thead>
-      <tbody>${(LOCAL.clientes||[]).filter(c=>c.est_id===EST).sort((a,b)=>Number(b.total_gasto)-Number(a.total_gasto)).slice(0,6).map(c=>`
+      <tbody>${(LOCAL.clientes||[]).filter(c=>!c.est_id||c.est_id===EST||c.est_id==='e1').sort((a,b)=>Number(b.total_gasto)-Number(a.total_gasto)).slice(0,6).map(c=>`
         <tr><td><div class="flex-cell"><div class="avatar" style="background:${avatarColor(c.nome)};width:24px;height:24px;font-size:10px">${initials(c.nome)}</div>${c.nome}</div></td>
         <td style="text-align:center">${c.visitas||0}</td>
         <td style="text-align:right;font-weight:700;font-family:monospace;font-size:13px">${fmt(c.total_gasto)}</td></tr>`).join('')}
@@ -1742,10 +1744,10 @@ function salvarCfg(){
 }
 
 function applyConfig(){
-  document.getElementById('sbNome').textContent=CFG.nome||'GestãoOS';
+  document.getElementById('sbNome').textContent=CFG.nome||'MireneOS';
   document.getElementById('sbNomeUser').textContent=CFG.responsavel||'Admin';
   document.getElementById('sbAvatar').textContent=initials(CFG.responsavel||'AD');
-  document.getElementById('sbSub').textContent='Sistema de gestão';
+  document.getElementById('sbSub').textContent='Gestão Inteligente';
   const emailEl=document.getElementById('sbEmailUser');
   if(emailEl)emailEl.textContent=AUTH_USER?.email||CFG.email||'Proprietário';
 }
@@ -1940,7 +1942,7 @@ function renderWizard(){
   <div class="wz-overlay">
     <div class="wz-box">
       <div class="wz-header">
-        <div class="wz-logo"><div class="sb-logo-icon" style="width:36px;height:36px"><i class="ti ti-building-store" style="font-size:20px"></i></div><div><div style="font-size:17px;font-weight:700;color:var(--text)">GestãoOS</div><div style="font-size:12px;color:var(--text-2)">Configure seu sistema</div></div></div>
+        <div class="wz-logo"><div class="sb-logo-icon" style="width:36px;height:36px"><i class="ti ti-building-store" style="font-size:20px"></i></div><div><div style="font-size:17px;font-weight:700;color:var(--text)">MireneOS</div><div style="font-size:12px;color:var(--text-2)">Configure seu sistema</div></div></div>
         <div class="wz-progress">
           <div style="display:flex;justify-content:space-between;margin-bottom:6px">
             <span style="font-size:12px;color:var(--text-2)">Passo ${WZ.step} de ${steps.length}</span>
@@ -2232,7 +2234,7 @@ function wzFinish(){
   hideWizard();
   document.getElementById('bottomNav').style.display='flex';
   renderAmanda();
-  toast('Bem-vindo ao GestãoOS! 🎉','success',4000);
+  toast('Bem-vindo ao MireneOS! 🎉','success',4000);
   nav('dashboard');
 }
 
@@ -2311,7 +2313,7 @@ function getAmandaSystemPrompt() {
   const idiomas = {'pt-BR':'português brasileiro','en':'English','es':'español','fr':'français'};
   const idioma = idiomas[lang] || 'português brasileiro';
 
-  return `Você é Amanda, assistente virtual do sistema GestãoOS para o estabelecimento "${nomeNeg}".
+  return `Você é Amanda, assistente virtual do sistema MireneOS para o estabelecimento "${nomeNeg}".
 
 PERSONALIDADE: Amigável, simpática e prestativa. Responde saudações como "bom dia", "oi", "olá" de forma calorosa. Use emojis com moderação (1-2 por mensagem). Seja direta e objetiva nas respostas técnicas.
 
@@ -2327,7 +2329,7 @@ CONTEXTO ATUAL DO NEGÓCIO:
 - Clientes cadastrados: ${nClientes}
 
 ESCOPO: Você APENAS responde sobre:
-1. Como usar o sistema GestãoOS (módulos, funcionalidades, navegação)
+1. Como usar o sistema MireneOS (módulos, funcionalidades, navegação)
 2. Dúvidas sobre os dados do negócio acima
 3. Saudações e perguntas gerais simples
 
@@ -2346,7 +2348,7 @@ MÓDULOS DO SISTEMA:
 - Relatórios: análises de receita, despesas, ranking de clientes e margem do cardápio
 - Configurações: tema, idioma, moeda, estabelecimentos e banco de dados
 
-SE perguntarem algo FORA do escopo: responda educadamente que você é especializada no GestãoOS e não pode ajudar com esse assunto, mas que fica feliz em ajudar com o sistema.
+SE perguntarem algo FORA do escopo: responda educadamente que você é especializada no MireneOS e não pode ajudar com esse assunto, mas que fica feliz em ajudar com o sistema.
 
 Seja concisa. Máximo 3-4 parágrafos por resposta.`;
 }
@@ -2363,7 +2365,7 @@ function amandaToggle() {
     const hora = new Date().getHours();
     const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
     const nomeNeg = LOCAL.estabelecimentos?.[0]?.nome || CFG.nome || 'seu negócio';
-    amandaAddMsg('assistant', `${saudacao}! 😊 Sou a Amanda, sua assistente no GestãoOS. Estou aqui para ajudar com o sistema **${nomeNeg}**.\n\nComo posso te ajudar hoje?`);
+    amandaAddMsg('assistant', `${saudacao}! 😊 Sou a Amanda, sua assistente no MireneOS. Estou aqui para ajudar com o sistema **${nomeNeg}**.\n\nComo posso te ajudar hoje?`);
   }
   if (amandaOpen) {
     setTimeout(() => {
@@ -2388,14 +2390,14 @@ function renderAmandaMsgs() {
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n/g, '<br>');
     return `<div style="display:flex;gap:8px;margin-bottom:12px;${isUser?'flex-direction:row-reverse':''}">
-      ${!isUser?`<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">AM</div>`:''}
+      ${!isUser?`<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--accent)"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;border-radius:50%"><defs><linearGradient id="amsg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FDDBB4"/><stop offset="100%" stop-color="#F5C08A"/></linearGradient><linearGradient id="amgg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient><style>@keyframes ambk{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.05)}}.amel{animation:ambk 4s 1s infinite;transform-origin:32px 38px}.amer{animation:ambk 4s 1s infinite;transform-origin:48px 38px}</style></defs><circle cx="40" cy="40" r="40" fill="url(#amgg)"/><path d="M20 42 Q18 56 23 66 Q32 76 40 77 Q48 76 57 66 Q62 56 60 42 Q50 36 40 35 Q30 36 20 42Z" fill="#1a1a2e"/><rect x="33" y="54" width="14" height="10" rx="4" fill="url(#amsg)"/><path d="M22 70 Q28 59 38 57 Q40 56 42 57 Q52 59 58 70 L63 80 L17 80Z" fill="url(#amgg)"/><ellipse cx="40" cy="44" rx="18" ry="20" fill="url(#amsg)"/><path d="M22 42 Q22 25 40 23 Q58 25 58 42 Q50 33 40 32 Q30 33 22 42Z" fill="#1a1a2e"/><path d="M22 42 Q17 49 19 57 Q21 62 23 63 Q21 53 23 44Z" fill="#1a1a2e"/><path d="M58 42 Q63 49 61 57 Q59 62 57 63 Q59 53 57 44Z" fill="#1a1a2e"/><ellipse cx="22" cy="47" rx="3.5" ry="5" fill="url(#amsg)"/><ellipse cx="58" cy="47" rx="3.5" ry="5" fill="url(#amsg)"/><path d="M22 36 Q22 21 40 19 Q58 21 58 36" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><rect x="17" y="41" width="9" height="14" rx="4" fill="#1e293b"/><rect x="19" y="43" width="5" height="10" rx="2.5" fill="#22c55e" opacity=".85"/><rect x="54" y="41" width="9" height="14" rx="4" fill="#1e293b"/><rect x="56" y="43" width="5" height="10" rx="2.5" fill="#22c55e" opacity=".85"/><path d="M20 52 Q13 56 12 62" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="64" r="2.5" fill="#22c55e"/><path d="M30 31 Q34 28 38 30" fill="none" stroke="#5a3e2b" stroke-width="1.5" stroke-linecap="round"/><path d="M42 30 Q46 28 50 31" fill="none" stroke="#5a3e2b" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="32" cy="40" rx="5.5" ry="5.5" fill="white"/><ellipse cx="48" cy="40" rx="5.5" ry="5.5" fill="white"/><g class="amel"><circle cx="32" cy="40" r="4" fill="#1e40af"/><circle cx="32" cy="40" r="2.5" fill="#0f172a"/><circle cx="33.2" cy="38.5" r="1.2" fill="white"/></g><g class="amer"><circle cx="48" cy="40" r="4" fill="#1e40af"/><circle cx="48" cy="40" r="2.5" fill="#0f172a"/><circle cx="49.2" cy="38.5" r="1.2" fill="white"/></g><ellipse cx="27" cy="47" rx="5" ry="3" fill="#f87171" opacity=".2"/><ellipse cx="53" cy="47" rx="5" ry="3" fill="#f87171" opacity=".2"/><path d="M34 52 Q40 57 46 52" fill="none" stroke="#c0704a" stroke-width="1.5" stroke-linecap="round"/></svg></div>`:''}
       <div style="max-width:78%;padding:.6rem .875rem;border-radius:${isUser?'12px 4px 12px 12px':'4px 12px 12px 12px'};background:${isUser?'var(--accent)':'var(--bg)'};color:${isUser?'#fff':'var(--text)'};font-size:13px;line-height:1.6;border:${isUser?'none':'1px solid var(--border)'}">
         ${text}
       </div>
     </div>`;
   }).join('') + (amandaTyping ? `
     <div style="display:flex;gap:8px;margin-bottom:12px">
-      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">AM</div>
+      <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--accent)"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;border-radius:50%"><defs><linearGradient id="amsg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FDDBB4"/><stop offset="100%" stop-color="#F5C08A"/></linearGradient><linearGradient id="amgg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient><style>@keyframes ambk{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.05)}}.amel{animation:ambk 4s 1s infinite;transform-origin:32px 38px}.amer{animation:ambk 4s 1s infinite;transform-origin:48px 38px}</style></defs><circle cx="40" cy="40" r="40" fill="url(#amgg)"/><path d="M20 42 Q18 56 23 66 Q32 76 40 77 Q48 76 57 66 Q62 56 60 42 Q50 36 40 35 Q30 36 20 42Z" fill="#1a1a2e"/><rect x="33" y="54" width="14" height="10" rx="4" fill="url(#amsg)"/><path d="M22 70 Q28 59 38 57 Q40 56 42 57 Q52 59 58 70 L63 80 L17 80Z" fill="url(#amgg)"/><ellipse cx="40" cy="44" rx="18" ry="20" fill="url(#amsg)"/><path d="M22 42 Q22 25 40 23 Q58 25 58 42 Q50 33 40 32 Q30 33 22 42Z" fill="#1a1a2e"/><path d="M22 42 Q17 49 19 57 Q21 62 23 63 Q21 53 23 44Z" fill="#1a1a2e"/><path d="M58 42 Q63 49 61 57 Q59 62 57 63 Q59 53 57 44Z" fill="#1a1a2e"/><ellipse cx="22" cy="47" rx="3.5" ry="5" fill="url(#amsg)"/><ellipse cx="58" cy="47" rx="3.5" ry="5" fill="url(#amsg)"/><path d="M22 36 Q22 21 40 19 Q58 21 58 36" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><rect x="17" y="41" width="9" height="14" rx="4" fill="#1e293b"/><rect x="19" y="43" width="5" height="10" rx="2.5" fill="#22c55e" opacity=".85"/><rect x="54" y="41" width="9" height="14" rx="4" fill="#1e293b"/><rect x="56" y="43" width="5" height="10" rx="2.5" fill="#22c55e" opacity=".85"/><path d="M20 52 Q13 56 12 62" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="64" r="2.5" fill="#22c55e"/><path d="M30 31 Q34 28 38 30" fill="none" stroke="#5a3e2b" stroke-width="1.5" stroke-linecap="round"/><path d="M42 30 Q46 28 50 31" fill="none" stroke="#5a3e2b" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="32" cy="40" rx="5.5" ry="5.5" fill="white"/><ellipse cx="48" cy="40" rx="5.5" ry="5.5" fill="white"/><g class="amel"><circle cx="32" cy="40" r="4" fill="#1e40af"/><circle cx="32" cy="40" r="2.5" fill="#0f172a"/><circle cx="33.2" cy="38.5" r="1.2" fill="white"/></g><g class="amer"><circle cx="48" cy="40" r="4" fill="#1e40af"/><circle cx="48" cy="40" r="2.5" fill="#0f172a"/><circle cx="49.2" cy="38.5" r="1.2" fill="white"/></g><ellipse cx="27" cy="47" rx="5" ry="3" fill="#f87171" opacity=".2"/><ellipse cx="53" cy="47" rx="5" ry="3" fill="#f87171" opacity=".2"/><path d="M34 52 Q40 57 46 52" fill="none" stroke="#c0704a" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div style="padding:.6rem .875rem;border-radius:4px 12px 12px 12px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;gap:4px">
         ${[0,1,2].map(i=>`<div style="width:6px;height:6px;border-radius:50%;background:var(--text-3);animation:amandaDot 1.2s ${i*0.2}s infinite"></div>`).join('')}
       </div>
@@ -2491,12 +2493,12 @@ function renderAmanda() {
 
     <!-- Header -->
     <div style="padding:.875rem 1rem;background:var(--accent);display:flex;align-items:center;gap:10px;flex-shrink:0">
-      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">AM</div>
+      <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.3)"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;border-radius:50%"><defs><linearGradient id="amsg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FDDBB4"/><stop offset="100%" stop-color="#F5C08A"/></linearGradient><linearGradient id="amgg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient><style>@keyframes ambk{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.05)}}.amel{animation:ambk 4s 1s infinite;transform-origin:32px 38px}.amer{animation:ambk 4s 1s infinite;transform-origin:48px 38px}</style></defs><circle cx="40" cy="40" r="40" fill="url(#amgg)"/><path d="M20 42 Q18 56 23 66 Q32 76 40 77 Q48 76 57 66 Q62 56 60 42 Q50 36 40 35 Q30 36 20 42Z" fill="#1a1a2e"/><rect x="33" y="54" width="14" height="10" rx="4" fill="url(#amsg)"/><path d="M22 70 Q28 59 38 57 Q40 56 42 57 Q52 59 58 70 L63 80 L17 80Z" fill="url(#amgg)"/><ellipse cx="40" cy="44" rx="18" ry="20" fill="url(#amsg)"/><path d="M22 42 Q22 25 40 23 Q58 25 58 42 Q50 33 40 32 Q30 33 22 42Z" fill="#1a1a2e"/><path d="M22 42 Q17 49 19 57 Q21 62 23 63 Q21 53 23 44Z" fill="#1a1a2e"/><path d="M58 42 Q63 49 61 57 Q59 62 57 63 Q59 53 57 44Z" fill="#1a1a2e"/><ellipse cx="22" cy="47" rx="3.5" ry="5" fill="url(#amsg)"/><ellipse cx="58" cy="47" rx="3.5" ry="5" fill="url(#amsg)"/><path d="M22 36 Q22 21 40 19 Q58 21 58 36" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><rect x="17" y="41" width="9" height="14" rx="4" fill="#1e293b"/><rect x="19" y="43" width="5" height="10" rx="2.5" fill="#22c55e" opacity=".85"/><rect x="54" y="41" width="9" height="14" rx="4" fill="#1e293b"/><rect x="56" y="43" width="5" height="10" rx="2.5" fill="#22c55e" opacity=".85"/><path d="M20 52 Q13 56 12 62" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="64" r="2.5" fill="#22c55e"/><path d="M30 31 Q34 28 38 30" fill="none" stroke="#5a3e2b" stroke-width="1.5" stroke-linecap="round"/><path d="M42 30 Q46 28 50 31" fill="none" stroke="#5a3e2b" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="32" cy="40" rx="5.5" ry="5.5" fill="white"/><ellipse cx="48" cy="40" rx="5.5" ry="5.5" fill="white"/><g class="amel"><circle cx="32" cy="40" r="4" fill="#1e40af"/><circle cx="32" cy="40" r="2.5" fill="#0f172a"/><circle cx="33.2" cy="38.5" r="1.2" fill="white"/></g><g class="amer"><circle cx="48" cy="40" r="4" fill="#1e40af"/><circle cx="48" cy="40" r="2.5" fill="#0f172a"/><circle cx="49.2" cy="38.5" r="1.2" fill="white"/></g><ellipse cx="27" cy="47" rx="5" ry="3" fill="#f87171" opacity=".2"/><ellipse cx="53" cy="47" rx="5" ry="3" fill="#f87171" opacity=".2"/><path d="M34 52 Q40 57 46 52" fill="none" stroke="#c0704a" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div style="flex:1">
         <div style="font-size:14px;font-weight:700;color:#fff">Amanda</div>
         <div style="font-size:11px;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px">
           <div style="width:6px;height:6px;border-radius:50%;background:#4ade80"></div>
-          Assistente GestãoOS
+          Assistente MireneOS
         </div>
       </div>
       <button onclick="amandaClear()" style="background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:11px;font-family:inherit">Limpar</button>
